@@ -1,0 +1,10 @@
+{
+  "profiles": {
+    "M3u8 Editor (Package)": {
+      "commandName": "MsixPackage"
+    },
+    "M3u8 Editor (Unpackaged)": {
+      "commandName": "Project"
+    }
+  }
+}
