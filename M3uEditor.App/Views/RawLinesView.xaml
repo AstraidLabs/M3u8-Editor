@@ -2,6 +2,7 @@
     x:Class="M3uEditor.App.Views.RawLinesView"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:behaviors="using:M3uEditor.App.Behaviors"
     xmlns:vm="using:M3uEditor.App.ViewModels">
     <Grid>
         <ListView ItemsSource="{Binding Lines}" SelectedIndex="{Binding SelectedIndex, Mode=TwoWay}">
@@ -11,7 +12,7 @@
                         <TextBlock Text="{Binding LineNumber}" Width="48" HorizontalAlignment="Right" />
                         <TextBlock Text="{Binding Text}" FontFamily="Consolas">
                             <TextBlock.TextHighlighters>
-                                <TextHighlighter Background="Orange" Ranges="{Binding Highlights}" />
+                                <TextHighlighter Background="Orange" behaviors:TextHighlighterExtensions.RangesSource="{Binding Highlights}" />
                             </TextBlock.TextHighlighters>
                         </TextBlock>
                     </StackPanel>
