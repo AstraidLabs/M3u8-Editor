@@ -3,6 +3,7 @@ using M3uEditor.Core.Analysis;
 using M3uEditor.Core.FindReplace;
 using M3uEditor.Core.Parsing;
 using M3uEditor.Core.Writing;
+using Xunit;
 
 namespace M3uEditor.Core.Tests;
 
