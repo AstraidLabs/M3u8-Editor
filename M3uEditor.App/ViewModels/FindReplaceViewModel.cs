@@ -2,6 +2,7 @@ using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using CommunityToolkit.Mvvm.Messaging;
 using M3uEditor.App.Messages;
+using M3uEditor.Core;
 using M3uEditor.Core.FindReplace;
 
 namespace M3uEditor.App.ViewModels;
