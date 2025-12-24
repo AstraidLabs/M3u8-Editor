@@ -10,9 +10,9 @@
                 <DataTemplate x:DataType="vm:RawLineDisplay">
                     <StackPanel Orientation="Horizontal" Spacing="8">
                         <TextBlock Text="{Binding LineNumber}" Width="48" HorizontalAlignment="Right" />
-                        <TextBlock Text="{Binding Text}" FontFamily="Consolas">
+                        <TextBlock Text="{Binding Text}" FontFamily="Consolas" behaviors:TextHighlighterExtensions.RangesSource="{Binding Highlights}">
                             <TextBlock.TextHighlighters>
-                                <TextHighlighter Background="Orange" behaviors:TextHighlighterExtensions.RangesSource="{Binding Highlights}" />
+                                <TextHighlighter Background="Orange" />
                             </TextBlock.TextHighlighters>
                         </TextBlock>
                     </StackPanel>
