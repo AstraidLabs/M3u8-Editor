@@ -8,19 +8,24 @@ namespace M3uEditor.App;
 
 public sealed partial class MainWindow : Window
 {
+    private readonly DocumentHostViewModel _viewModel;
+
     public MainWindow()
     {
         InitializeComponent();
 
         // WinUI 3: DataContext musi byt na Root elementu (Grid), ne na Window.
-        Root.DataContext = new DocumentHostViewModel();
+        _viewModel = new DocumentHostViewModel();
+        if (Content is FrameworkElement root)
+        {
+            root.DataContext = _viewModel;
+        }
 
-        var vm = (DocumentHostViewModel)Root.DataContext;
-        vm.AttachWindow(this);
-        vm.DispatcherQueue = DispatcherQueue;
+        _viewModel.AttachWindow(this);
+        _viewModel.DispatcherQueue = DispatcherQueue;
     }
 
-    private DocumentHostViewModel ViewModel => (DocumentHostViewModel)Root.DataContext;
+    private DocumentHostViewModel ViewModel => _viewModel;
 
     private void OnOpenInvoked(KeyboardAccelerator sender, KeyboardAcceleratorInvokedEventArgs args)
     {
