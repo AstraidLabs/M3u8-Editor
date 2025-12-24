@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using Microsoft.UI.Xaml;
+using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Documents;
 
 namespace M3uEditor.App.Behaviors;
@@ -13,25 +14,28 @@ public static class TextHighlighterExtensions
             typeof(TextHighlighterExtensions),
             new PropertyMetadata(null, OnRangesSourceChanged));
 
-    public static IEnumerable<TextRange>? GetRangesSource(TextHighlighter obj) =>
+    public static IEnumerable<TextRange>? GetRangesSource(TextBlock obj) =>
         (IEnumerable<TextRange>?)obj.GetValue(RangesSourceProperty);
 
-    public static void SetRangesSource(TextHighlighter obj, IEnumerable<TextRange>? value) =>
+    public static void SetRangesSource(TextBlock obj, IEnumerable<TextRange>? value) =>
         obj.SetValue(RangesSourceProperty, value);
 
     private static void OnRangesSourceChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
     {
-        if (d is not TextHighlighter highlighter)
+        if (d is not TextBlock textBlock)
         {
             return;
         }
 
-        highlighter.Ranges.Clear();
-        if (e.NewValue is IEnumerable<TextRange> ranges)
+        foreach (var highlighter in textBlock.TextHighlighters)
         {
-            foreach (var range in ranges)
+            highlighter.Ranges.Clear();
+            if (e.NewValue is IEnumerable<TextRange> ranges)
             {
-                highlighter.Ranges.Add(range);
+                foreach (var range in ranges)
+                {
+                    highlighter.Ranges.Add(range);
+                }
             }
         }
     }
