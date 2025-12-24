@@ -4,7 +4,7 @@
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:vm="using:M3uEditor.App.ViewModels"
     xmlns:views="using:M3uEditor.App.Views"
-    xmlns:controls="using:CommunityToolkit.WinUI.UI.Controls"
+    xmlns:controls="using:CommunityToolkit.WinUI.Controls"
     Title="M3u Editor">
     <Window.DataContext>
         <vm:DocumentHostViewModel />
