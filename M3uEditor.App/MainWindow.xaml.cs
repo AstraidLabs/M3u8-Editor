@@ -12,7 +12,7 @@ public sealed partial class MainWindow : Window
     {
         InitializeComponent();
 
-        // WinUI 3: DataContext musí být na Root elementu (Grid), ne na Window.
+        // WinUI 3: DataContext musi byt na Root elementu (Grid), ne na Window.
         Root.DataContext = new DocumentHostViewModel();
 
         var vm = (DocumentHostViewModel)Root.DataContext;
@@ -55,6 +55,8 @@ public sealed partial class MainWindow : Window
     private void OnDiagnosticSelected(object sender, SelectionChangedEventArgs e)
     {
         if (e.AddedItems.Count > 0 && e.AddedItems[0] is Diagnostic diagnostic)
+        {
             ViewModel.NavigateDiagnosticCommand.Execute(diagnostic);
+        }
     }
 }
