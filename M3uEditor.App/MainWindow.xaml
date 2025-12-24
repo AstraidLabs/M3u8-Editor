@@ -14,7 +14,7 @@
             <KeyboardAccelerator Key="H" Modifiers="Control" Invoked="OnReplaceInvoked" />
             <KeyboardAccelerator Key="F3" Invoked="OnFindNextInvoked" />
         </Grid.KeyboardAccelerators>
-        
+
         <Grid.Resources>
             <DataTemplate x:Key="IptvEditorTemplate" x:DataType="vm:IptvEditorViewModel">
                 <views:IptvEditorView />
@@ -27,6 +27,12 @@
             <DataTemplate x:Key="HlsMediaEditorTemplate" x:DataType="vm:HlsMediaEditorViewModel">
                 <views:HlsMediaEditorView />
             </DataTemplate>
+
+            <views:EditorTemplateSelector
+                x:Key="EditorTemplateSelector"
+                HlsMasterTemplate="{StaticResource HlsMasterEditorTemplate}"
+                HlsMediaTemplate="{StaticResource HlsMediaEditorTemplate}"
+                IptvTemplate="{StaticResource IptvEditorTemplate}" />
         </Grid.Resources>
 
         <Grid.RowDefinitions>
@@ -53,7 +59,9 @@
                 <RowDefinition Height="*" />
             </Grid.RowDefinitions>
 
-            <ContentControl Content="{Binding CurrentEditorVm}" />
+            <ContentControl
+                Content="{Binding CurrentEditorVm}"
+                ContentTemplateSelector="{StaticResource EditorTemplateSelector}" />
             <views:RawLinesView Grid.Row="1" DataContext="{Binding RawLinesViewModel}" />
         </Grid>
 
