@@ -6,21 +6,29 @@
     xmlns:views="using:M3uEditor.App.Views"
     xmlns:controls="using:CommunityToolkit.WinUI.Controls"
     Title="M3u Editor">
-    <Window.DataContext>
-        <vm:DocumentHostViewModel />
-    </Window.DataContext>
-    <Window.Resources>
-        <DataTemplate x:DataType="vm:IptvEditorViewModel">
-            <views:IptvEditorView />
-        </DataTemplate>
-        <DataTemplate x:DataType="vm:HlsMasterEditorViewModel">
-            <views:HlsMasterEditorView />
-        </DataTemplate>
-        <DataTemplate x:DataType="vm:HlsMediaEditorViewModel">
-            <views:HlsMediaEditorView />
-        </DataTemplate>
-    </Window.Resources>
-    <Grid>
+    <Grid x:Name="Root">
+        <Grid.KeyboardAccelerators>
+            <KeyboardAccelerator Key="O" Modifiers="Control" Invoked="OnOpenInvoked" />
+            <KeyboardAccelerator Key="S" Modifiers="Control" Invoked="OnSaveInvoked" />
+            <KeyboardAccelerator Key="F" Modifiers="Control" Invoked="OnFindInvoked" />
+            <KeyboardAccelerator Key="H" Modifiers="Control" Invoked="OnReplaceInvoked" />
+            <KeyboardAccelerator Key="F3" Invoked="OnFindNextInvoked" />
+        </Grid.KeyboardAccelerators>
+        
+        <Grid.Resources>
+            <DataTemplate x:Key="IptvEditorTemplate" x:DataType="vm:IptvEditorViewModel">
+                <views:IptvEditorView />
+            </DataTemplate>
+
+            <DataTemplate x:Key="HlsMasterEditorTemplate" x:DataType="vm:HlsMasterEditorViewModel">
+                <views:HlsMasterEditorView />
+            </DataTemplate>
+
+            <DataTemplate x:Key="HlsMediaEditorTemplate" x:DataType="vm:HlsMediaEditorViewModel">
+                <views:HlsMediaEditorView />
+            </DataTemplate>
+        </Grid.Resources>
+
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto" />
             <RowDefinition Height="Auto" />
@@ -44,12 +52,16 @@
                 <RowDefinition Height="2*" />
                 <RowDefinition Height="*" />
             </Grid.RowDefinitions>
+
             <ContentControl Content="{Binding CurrentEditorVm}" />
             <views:RawLinesView Grid.Row="1" DataContext="{Binding RawLinesViewModel}" />
         </Grid>
 
         <Expander Grid.Row="3" Header="Problems" IsExpanded="True">
-            <ListView ItemsSource="{Binding Diagnostics}" SelectionChanged="OnDiagnosticSelected" IsItemClickEnabled="True">
+            <ListView
+                ItemsSource="{Binding Diagnostics}"
+                SelectionChanged="OnDiagnosticSelected"
+                IsItemClickEnabled="True">
                 <ListView.ItemTemplate>
                     <DataTemplate>
                         <StackPanel Orientation="Horizontal" Spacing="8">
