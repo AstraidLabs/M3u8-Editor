@@ -1,0 +1,22 @@
+<UserControl
+    x:Class="M3uEditor.App.Views.RawLinesView"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:vm="using:M3uEditor.App.ViewModels">
+    <Grid>
+        <ListView ItemsSource="{Binding Lines}" SelectedIndex="{Binding SelectedIndex, Mode=TwoWay}">
+            <ListView.ItemTemplate>
+                <DataTemplate x:DataType="vm:RawLineDisplay">
+                    <StackPanel Orientation="Horizontal" Spacing="8">
+                        <TextBlock Text="{Binding LineNumber}" Width="48" HorizontalAlignment="Right" />
+                        <TextBlock Text="{Binding Text}" FontFamily="Consolas">
+                            <TextBlock.TextHighlighters>
+                                <TextHighlighter Background="Orange" Ranges="{Binding Highlights}" />
+                            </TextBlock.TextHighlighters>
+                        </TextBlock>
+                    </StackPanel>
+                </DataTemplate>
+            </ListView.ItemTemplate>
+        </ListView>
+    </Grid>
+</UserControl>

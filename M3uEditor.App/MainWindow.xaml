@@ -1,0 +1,71 @@
+<Window
+    x:Class="M3uEditor.App.MainWindow"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:vm="using:M3uEditor.App.ViewModels"
+    xmlns:views="using:M3uEditor.App.Views"
+    xmlns:controls="using:CommunityToolkit.WinUI.UI.Controls"
+    Title="M3u Editor">
+    <Window.DataContext>
+        <vm:DocumentHostViewModel />
+    </Window.DataContext>
+    <Window.Resources>
+        <DataTemplate x:DataType="vm:IptvEditorViewModel">
+            <views:IptvEditorView />
+        </DataTemplate>
+        <DataTemplate x:DataType="vm:HlsMasterEditorViewModel">
+            <views:HlsMasterEditorView />
+        </DataTemplate>
+        <DataTemplate x:DataType="vm:HlsMediaEditorViewModel">
+            <views:HlsMediaEditorView />
+        </DataTemplate>
+    </Window.Resources>
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+        </Grid.RowDefinitions>
+
+        <CommandBar Grid.Row="0">
+            <AppBarButton Icon="OpenFile" Label="Open" Command="{Binding OpenCommand}" />
+            <AppBarButton Icon="Save" Label="Save" Command="{Binding SaveCommand}" />
+            <AppBarButton Icon="SaveLocal" Label="Save As" Command="{Binding SaveAsCommand}" />
+            <AppBarButton Icon="Find" Label="Find/Replace" Command="{Binding ShowFindReplaceCommand}" />
+            <AppBarButton Icon="Contact" Label="Validate" Command="{Binding ValidateCommand}" />
+        </CommandBar>
+
+        <views:FindReplacePanel Grid.Row="1" />
+
+        <Grid Grid.Row="2">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="2*" />
+                <RowDefinition Height="*" />
+            </Grid.RowDefinitions>
+            <ContentControl Content="{Binding CurrentEditorVm}" />
+            <views:RawLinesView Grid.Row="1" DataContext="{Binding RawLinesViewModel}" />
+        </Grid>
+
+        <Expander Grid.Row="3" Header="Problems" IsExpanded="True">
+            <ListView ItemsSource="{Binding Diagnostics}" SelectionChanged="OnDiagnosticSelected" IsItemClickEnabled="True">
+                <ListView.ItemTemplate>
+                    <DataTemplate>
+                        <StackPanel Orientation="Horizontal" Spacing="8">
+                            <TextBlock Text="{Binding Severity}" Width="80" />
+                            <TextBlock Text="{Binding Code}" Width="80" />
+                            <TextBlock Text="{Binding Message}" TextWrapping="Wrap" />
+                            <TextBlock Text="{Binding Span.LineIndex}" Margin="8,0,0,0" />
+                        </StackPanel>
+                    </DataTemplate>
+                </ListView.ItemTemplate>
+            </ListView>
+        </Expander>
+
+        <StackPanel Grid.Row="4" Orientation="Horizontal" Spacing="12" Padding="12,4">
+            <TextBlock Text="{Binding CurrentPath}" />
+            <TextBlock Text="{Binding CurrentKind}" />
+        </StackPanel>
+    </Grid>
+</Window>

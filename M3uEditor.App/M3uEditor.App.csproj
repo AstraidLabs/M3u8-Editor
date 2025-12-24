@@ -1,0 +1,36 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <OutputType>WinExe</OutputType>
+    <TargetFramework>net10.0-windows10.0.19041.0</TargetFramework>
+    <TargetPlatformMinVersion>10.0.19041.0</TargetPlatformMinVersion>
+    <LangVersion>13.0</LangVersion>
+    <UseWinUI>true</UseWinUI>
+    <EnableMsixTooling>true</EnableMsixTooling>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Platforms>x86;x64;ARM64</Platforms>
+    <PublishProfile>win-$(Platform).pubxml</PublishProfile>
+    <ApplicationIcon></ApplicationIcon>
+    <GenerateAppInstallerFile>false</GenerateAppInstallerFile>
+    <SupportedOSPlatformVersion>10.0.19041.0</SupportedOSPlatformVersion>
+  </PropertyGroup>
+  <ItemGroup>
+    <PackageReference Include="Microsoft.Windows.SDK.BuildTools" Version="10.0.26100.0" />
+    <PackageReference Include="Microsoft.WindowsAppSDK" Version="1.5.240812000" />
+    <PackageReference Include="CommunityToolkit.Mvvm" Version="8.3.2" />
+    <PackageReference Include="CommunityToolkit.WinUI" Version="8.1.240916" />
+    <PackageReference Include="CommunityToolkit.WinUI.UI.Controls" Version="8.1.240916" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\M3uEditor.Core\M3uEditor.Core.csproj" />
+  </ItemGroup>
+  <ItemGroup>
+    <Page Include="App.xaml" />
+    <Page Include="MainWindow.xaml" />
+    <Page Include="Views\FindReplacePanel.xaml" />
+    <Page Include="Views\IptvEditorView.xaml" />
+    <Page Include="Views\HlsMasterEditorView.xaml" />
+    <Page Include="Views\HlsMediaEditorView.xaml" />
+    <Page Include="Views\RawLinesView.xaml" />
+  </ItemGroup>
+</Project>
