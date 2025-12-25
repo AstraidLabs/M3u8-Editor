@@ -1,3 +1,4 @@
+using System;
 using System.Collections.ObjectModel;
 using System.IO;
 using System.Text;
@@ -20,9 +21,23 @@ using WinRT.Interop;
 
 namespace M3uEditor.App.ViewModels;
 
+public enum SidebarTab
+{
+    Explorer,
+    Search,
+    Problems
+}
+
+public enum BottomPanelTab
+{
+    Raw,
+    Problems
+}
+
 public partial class DocumentHostViewModel : ObservableObject
 {
     private Window? _window;
+    private double _lastOpenBottomHeight = 240;
 
     [ObservableProperty]
     private PlaylistDocument? document;
@@ -47,6 +62,21 @@ public partial class DocumentHostViewModel : ObservableObject
 
     [ObservableProperty]
     private bool isFindReplaceOpen;
+
+    [ObservableProperty]
+    private SidebarTab activeSidebarTab = SidebarTab.Explorer;
+
+    [ObservableProperty]
+    private BottomPanelTab bottomPanelTab = BottomPanelTab.Raw;
+
+    [ObservableProperty]
+    private bool isBottomPanelOpen = true;
+
+    [ObservableProperty]
+    private double bottomPanelHeight = 240;
+
+    [ObservableProperty]
+    private int focusFindRequestId;
 
     public DispatcherQueue? DispatcherQueue { get; set; }
 
@@ -155,6 +185,11 @@ public partial class DocumentHostViewModel : ObservableObject
     private void ShowFindReplace()
     {
         IsFindReplaceOpen = !IsFindReplaceOpen;
+        if (IsFindReplaceOpen)
+        {
+            ActiveSidebarTab = SidebarTab.Search;
+            RequestFindFocus();
+        }
     }
 
     [RelayCommand]
@@ -166,6 +201,33 @@ public partial class DocumentHostViewModel : ObservableObject
         }
 
         WeakReferenceMessenger.Default.Send(new NavigateToSpanMessage(diagnostic.Span));
+    }
+
+    public void RequestFindFocus()
+    {
+        FocusFindRequestId++;
+    }
+
+    partial void OnIsBottomPanelOpenChanged(bool value)
+    {
+        if (value)
+        {
+            BottomPanelHeight = Math.Max(160, _lastOpenBottomHeight);
+        }
+        else
+        {
+            _lastOpenBottomHeight = BottomPanelHeight;
+            BottomPanelHeight = 0;
+        }
+    }
+
+    partial void OnBottomPanelHeightChanged(double value)
+    {
+        if (value > 0)
+        {
+            IsBottomPanelOpen = true;
+            _lastOpenBottomHeight = value;
+        }
     }
 
     private void InitializePicker(object picker)
@@ -207,7 +269,6 @@ public partial class DocumentHostViewModel : ObservableObject
         Document.DetectedKind = reparsed.DetectedKind;
         CurrentKind = reparsed.DetectedKind;
         rawLinesViewModel.Load(Document);
-        diagnostics = new ObservableCollection<Diagnostic>(PlaylistAnalyzer.Analyze(Document));
-        OnPropertyChanged(nameof(Diagnostics));
+        Diagnostics = new ObservableCollection<Diagnostic>(PlaylistAnalyzer.Analyze(Document));
     }
 }

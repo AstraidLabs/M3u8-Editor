@@ -4,20 +4,49 @@
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:behaviors="using:M3uEditor.App.Behaviors"
     xmlns:vm="using:M3uEditor.App.ViewModels">
-    <Grid>
-        <ListView ItemsSource="{Binding Lines}" SelectedIndex="{Binding SelectedIndex, Mode=TwoWay}">
+    <Border
+        Background="{ThemeResource VscPanelBrush}"
+        BorderBrush="{ThemeResource VscBorderBrush}"
+        BorderThickness="1"
+        CornerRadius="8">
+        <ListView
+            ItemsSource="{Binding Lines}"
+            Padding="0"
+            SelectedIndex="{Binding SelectedIndex, Mode=TwoWay}"
+            SelectionMode="Single">
             <ListView.ItemTemplate>
                 <DataTemplate x:DataType="vm:RawLineDisplay">
-                    <StackPanel Orientation="Horizontal" Spacing="8">
-                        <TextBlock Text="{Binding LineNumber}" Width="48" HorizontalAlignment="Right" />
-                        <TextBlock Text="{Binding Text}" FontFamily="Consolas" behaviors:TextHighlighterExtensions.RangesSource="{Binding Highlights}">
+                    <Grid ColumnSpacing="8" Padding="8,4">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="56" />
+                            <ColumnDefinition Width="*" />
+                        </Grid.ColumnDefinitions>
+                        <Border
+                            Grid.Column="0"
+                            Background="{ThemeResource VscSurfaceBrush}"
+                            BorderBrush="{ThemeResource VscBorderBrush}"
+                            BorderThickness="0,0,1,0"
+                            CornerRadius="4"
+                            Padding="8,2">
+                            <TextBlock
+                                HorizontalAlignment="Right"
+                                Style="{StaticResource MonoTextBlockStyle}"
+                                Text="{Binding LineNumber}"
+                                Foreground="{ThemeResource VscMutedForegroundBrush}" />
+                        </Border>
+                        <TextBlock
+                            Grid.Column="1"
+                            FontFamily="{ThemeResource MonoFontFamily}"
+                            Text="{Binding Text}"
+                            behaviors:TextHighlighterExtensions.RangesSource="{Binding Highlights}"
+                            TextWrapping="NoWrap">
                             <TextBlock.TextHighlighters>
-                                <TextHighlighter Background="Orange" />
+                                <TextHighlighter Background="#33F0B429" />
                             </TextBlock.TextHighlighters>
                         </TextBlock>
-                    </StackPanel>
+                    </Grid>
                 </DataTemplate>
             </ListView.ItemTemplate>
         </ListView>
-    </Grid>
+    </Border>
 </UserControl>
