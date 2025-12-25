@@ -5,6 +5,7 @@
     xmlns:vm="using:M3uEditor.App.ViewModels"
     xmlns:views="using:M3uEditor.App.Views"
     xmlns:controls="using:CommunityToolkit.WinUI.Controls"
+    xmlns:winui="using:Microsoft.UI.Xaml.Controls"
     Title="M3u Editor">
     <Grid x:Name="Root" Background="{ThemeResource VscBackgroundBrush}">
         <Grid.KeyboardAccelerators>
@@ -203,7 +204,7 @@
                         ContentTemplateSelector="{StaticResource EditorTemplateSelector}" />
                 </Border>
 
-                <GridSplitter
+                <winui:GridSplitter
                     Grid.Row="1"
                     HorizontalAlignment="Stretch"
                     Background="{ThemeResource VscBorderBrush}"
@@ -309,7 +310,10 @@
                 CornerRadius="10"
                 Padding="10,4"
                 Margin="8,0,0,0">
-                <TextBlock Text="{Binding Diagnostics.Count, StringFormat='{}{0} issues'}" />
+                <TextBlock>
+                    <Run Text="{Binding Diagnostics.Count}" />
+                    <Run Text=" issues" />
+                </TextBlock>
             </Border>
         </Grid>
     </Grid>
