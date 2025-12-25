@@ -2,76 +2,115 @@
     x:Class="M3uEditor.App.Views.HlsMediaEditorView"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
-    <Grid>
+    <Grid RowSpacing="12">
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto" />
             <RowDefinition Height="2*" />
             <RowDefinition Height="*" />
         </Grid.RowDefinitions>
-        <StackPanel Orientation="Horizontal" Spacing="8" Padding="8">
-            <TextBlock Text="Header tags:" VerticalAlignment="Center" />
-            <ItemsControl ItemsSource="{Binding HeaderTags}">
-                <ItemsControl.ItemTemplate>
-                    <DataTemplate>
-                        <Border BorderThickness="1" BorderBrush="DarkGray" CornerRadius="4" Padding="4" Margin="4">
-                            <TextBlock Text="{Binding}" />
-                        </Border>
-                    </DataTemplate>
-                </ItemsControl.ItemTemplate>
-            </ItemsControl>
-        </StackPanel>
-        <Grid Grid.Row="1">
-            <Grid.RowDefinitions>
-                <RowDefinition Height="Auto" />
-                <RowDefinition Height="*" />
-            </Grid.RowDefinitions>
-            <Grid Padding="12,8" ColumnSpacing="12">
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="Auto" />
-                    <ColumnDefinition Width="*" />
-                    <ColumnDefinition Width="2*" />
-                    <ColumnDefinition Width="3*" />
-                </Grid.ColumnDefinitions>
-                <TextBlock Grid.Column="0" Text="Index" FontWeight="SemiBold" />
-                <TextBlock Grid.Column="1" Text="Duration" FontWeight="SemiBold" />
-                <TextBlock Grid.Column="2" Text="Title" FontWeight="SemiBold" />
-                <TextBlock Grid.Column="3" Text="URI" FontWeight="SemiBold" />
+        <Border
+            Background="{ThemeResource VscSurfaceBrush}"
+            BorderBrush="{ThemeResource VscBorderBrush}"
+            BorderThickness="1"
+            CornerRadius="8"
+            Padding="10">
+            <StackPanel Orientation="Horizontal" Spacing="8">
+                <TextBlock Text="Header tags:" VerticalAlignment="Center" Style="{StaticResource LabelTextBlockStyle}" />
+                <ItemsControl ItemsSource="{Binding HeaderTags}" Margin="8,0,0,0">
+                    <ItemsControl.ItemTemplate>
+                        <DataTemplate>
+                            <Border
+                                Background="{ThemeResource VscPanelBrush}"
+                                BorderBrush="{ThemeResource VscBorderBrush}"
+                                BorderThickness="1"
+                                CornerRadius="4"
+                                Padding="6"
+                                Margin="4,0">
+                                <TextBlock Text="{Binding}" />
+                            </Border>
+                        </DataTemplate>
+                    </ItemsControl.ItemTemplate>
+                    <ItemsControl.ItemsPanel>
+                        <ItemsPanelTemplate>
+                            <WrapGrid Orientation="Horizontal" MaximumRowsOrColumns="3" />
+                        </ItemsPanelTemplate>
+                    </ItemsControl.ItemsPanel>
+                </ItemsControl>
+            </StackPanel>
+        </Border>
+        <Border
+            Grid.Row="1"
+            Background="{ThemeResource VscSurfaceBrush}"
+            BorderBrush="{ThemeResource VscBorderBrush}"
+            BorderThickness="1"
+            CornerRadius="8">
+            <Grid>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="*" />
+                </Grid.RowDefinitions>
+                <Grid
+                    Padding="12,8"
+                    ColumnSpacing="12"
+                    Background="{ThemeResource VscPanelBrush}"
+                    BorderBrush="{ThemeResource VscBorderBrush}"
+                    BorderThickness="0,0,0,1">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto" />
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="2*" />
+                        <ColumnDefinition Width="3*" />
+                    </Grid.ColumnDefinitions>
+                    <TextBlock Grid.Column="0" Text="Index" FontWeight="SemiBold" Foreground="{ThemeResource VscMutedForegroundBrush}" />
+                    <TextBlock Grid.Column="1" Text="Duration" FontWeight="SemiBold" Foreground="{ThemeResource VscMutedForegroundBrush}" />
+                    <TextBlock Grid.Column="2" Text="Title" FontWeight="SemiBold" Foreground="{ThemeResource VscMutedForegroundBrush}" />
+                    <TextBlock Grid.Column="3" Text="URI" FontWeight="SemiBold" Foreground="{ThemeResource VscMutedForegroundBrush}" />
+                </Grid>
+                <ListView
+                    Grid.Row="1"
+                    ItemsSource="{Binding Segments}"
+                    Padding="0"
+                    SelectedItem="{Binding SelectedSegment, Mode=TwoWay}"
+                    SelectionMode="Single">
+                    <ListView.ItemTemplate>
+                        <DataTemplate>
+                            <Grid Padding="12,6" ColumnSpacing="12">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="Auto" />
+                                    <ColumnDefinition Width="*" />
+                                    <ColumnDefinition Width="2*" />
+                                    <ColumnDefinition Width="3*" />
+                                </Grid.ColumnDefinitions>
+                                <TextBlock Grid.Column="0" Text="{Binding ExtInfLineIndex}" />
+                                <TextBlock Grid.Column="1" Text="{Binding Duration}" />
+                                <TextBlock Grid.Column="2" Text="{Binding Title}" />
+                                <TextBlock Grid.Column="3" Text="{Binding Uri}" TextTrimming="CharacterEllipsis" />
+                            </Grid>
+                        </DataTemplate>
+                    </ListView.ItemTemplate>
+                </ListView>
             </Grid>
-            <ListView
-                Grid.Row="1"
-                ItemsSource="{Binding Segments}"
-                SelectedItem="{Binding SelectedSegment, Mode=TwoWay}"
-                SelectionMode="Single">
-                <ListView.ItemTemplate>
-                    <DataTemplate>
-                        <Grid Padding="12,6" ColumnSpacing="12">
-                            <Grid.ColumnDefinitions>
-                                <ColumnDefinition Width="Auto" />
-                                <ColumnDefinition Width="*" />
-                                <ColumnDefinition Width="2*" />
-                                <ColumnDefinition Width="3*" />
-                            </Grid.ColumnDefinitions>
-                            <TextBlock Grid.Column="0" Text="{Binding ExtInfLineIndex}" />
-                            <TextBlock Grid.Column="1" Text="{Binding Duration}" />
-                            <TextBlock Grid.Column="2" Text="{Binding Title}" />
-                            <TextBlock Grid.Column="3" Text="{Binding Uri}" TextTrimming="CharacterEllipsis" />
-                        </Grid>
-                    </DataTemplate>
-                </ListView.ItemTemplate>
-            </ListView>
-        </Grid>
-        <StackPanel Grid.Row="2" Orientation="Vertical" Spacing="8" Padding="8">
-            <StackPanel Orientation="Horizontal" Spacing="8">
-                <TextBlock Text="Duration" Width="100" />
-                <TextBox Text="{Binding SelectedSegment.Duration, Mode=TwoWay}" Width="120" />
-                <TextBlock Text="Title" Width="60" />
-                <TextBox Text="{Binding SelectedSegment.Title, Mode=TwoWay}" Width="320" />
+        </Border>
+        <Border
+            Grid.Row="2"
+            Background="{ThemeResource VscSurfaceBrush}"
+            BorderBrush="{ThemeResource VscBorderBrush}"
+            BorderThickness="1"
+            CornerRadius="8">
+            <StackPanel Orientation="Vertical" Spacing="10" Padding="12">
+                <TextBlock Text="Segment details" Style="{StaticResource LabelTextBlockStyle}" />
+                <StackPanel Orientation="Horizontal" Spacing="8">
+                    <TextBlock Text="Duration" Width="100" />
+                    <TextBox Text="{Binding SelectedSegment.Duration, Mode=TwoWay}" Width="120" />
+                    <TextBlock Text="Title" Width="60" />
+                    <TextBox Text="{Binding SelectedSegment.Title, Mode=TwoWay}" Width="320" />
+                </StackPanel>
+                <StackPanel Orientation="Horizontal" Spacing="8">
+                    <TextBlock Text="URI" Width="100" />
+                    <TextBox Text="{Binding SelectedSegment.Uri, Mode=TwoWay}" Width="420" />
+                </StackPanel>
+                <Button Content="Apply" Command="{Binding ApplySelectedCommand}" HorizontalAlignment="Left" />
             </StackPanel>
-            <StackPanel Orientation="Horizontal" Spacing="8">
-                <TextBlock Text="URI" Width="100" />
-                <TextBox Text="{Binding SelectedSegment.Uri, Mode=TwoWay}" Width="420" />
-            </StackPanel>
-            <Button Content="Apply" Command="{Binding ApplySelectedCommand}" HorizontalAlignment="Left" />
-        </StackPanel>
+        </Border>
     </Grid>
 </UserControl>

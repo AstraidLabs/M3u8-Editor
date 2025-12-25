@@ -6,7 +6,7 @@
     xmlns:views="using:M3uEditor.App.Views"
     xmlns:controls="using:CommunityToolkit.WinUI.Controls"
     Title="M3u Editor">
-    <Grid x:Name="Root">
+    <Grid x:Name="Root" Background="{ThemeResource VscBackgroundBrush}">
         <Grid.KeyboardAccelerators>
             <KeyboardAccelerator Key="O" Modifiers="Control" Invoked="OnOpenInvoked" />
             <KeyboardAccelerator Key="S" Modifiers="Control" Invoked="OnSaveInvoked" />
@@ -28,6 +28,29 @@
                 <views:HlsMediaEditorView />
             </DataTemplate>
 
+            <DataTemplate x:Key="DiagnosticTemplate" x:DataType="core:Diagnostic" xmlns:core="using:M3uEditor.Core">
+                <Grid ColumnSpacing="12" Padding="8">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto" />
+                        <ColumnDefinition Width="80" />
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="60" />
+                    </Grid.ColumnDefinitions>
+                    <Border
+                        Background="{Binding Severity, Converter={StaticResource DiagnosticSeverityToBrushConverter}}"
+                        CornerRadius="10"
+                        Padding="8,2">
+                        <TextBlock
+                            FontWeight="SemiBold"
+                            Foreground="Black"
+                            Text="{Binding Severity}" />
+                    </Border>
+                    <TextBlock Grid.Column="1" Text="{Binding Code}" Style="{StaticResource LabelTextBlockStyle}" />
+                    <TextBlock Grid.Column="2" Text="{Binding Message}" TextWrapping="Wrap" />
+                    <TextBlock Grid.Column="3" Text="{Binding Span.LineIndex}" HorizontalAlignment="Right" />
+                </Grid>
+            </DataTemplate>
+
             <views:EditorTemplateSelector
                 x:Key="EditorTemplateSelector"
                 HlsMasterTemplate="{StaticResource HlsMasterEditorTemplate}"
@@ -37,55 +60,257 @@
 
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto" />
-            <RowDefinition Height="Auto" />
             <RowDefinition Height="*" />
-            <RowDefinition Height="Auto" />
             <RowDefinition Height="Auto" />
         </Grid.RowDefinitions>
 
-        <CommandBar Grid.Row="0">
-            <AppBarButton Icon="OpenFile" Label="Open" Command="{Binding OpenCommand}" />
-            <AppBarButton Icon="Save" Label="Save" Command="{Binding SaveCommand}" />
-            <AppBarButton Icon="SaveLocal" Label="Save As" Command="{Binding SaveAsCommand}" />
-            <AppBarButton Icon="Find" Label="Find/Replace" Command="{Binding ShowFindReplaceCommand}" />
-            <AppBarButton Icon="Contact" Label="Validate" Command="{Binding ValidateCommand}" />
-        </CommandBar>
+        <!-- Top bar -->
+        <Border
+            Grid.Row="0"
+            Background="{ThemeResource VscSurfaceBrush}"
+            BorderBrush="{ThemeResource VscBorderBrush}"
+            BorderThickness="0,0,0,1"
+            Padding="16,10">
+            <Grid ColumnSpacing="16">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto" />
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="Auto" />
+                </Grid.ColumnDefinitions>
+                <StackPanel Orientation="Horizontal" Spacing="8" VerticalAlignment="Center">
+                    <TextBlock Text="M3U Workbench" Style="{StaticResource TitleTextBlockStyle}" />
+                    <Border Background="{ThemeResource VscPanelBrush}" CornerRadius="6" Padding="8,4">
+                        <TextBlock Text="VS Code inspired" Style="{StaticResource LabelTextBlockStyle}" />
+                    </Border>
+                </StackPanel>
 
-        <views:FindReplacePanel Grid.Row="1" />
+                <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="12" HorizontalAlignment="Center">
+                    <Button Content="Open" Command="{Binding OpenCommand}" />
+                    <Button Content="Save" Command="{Binding SaveCommand}" />
+                    <Button Content="Save As" Command="{Binding SaveAsCommand}" />
+                    <Button Content="Find / Replace" Command="{Binding ShowFindReplaceCommand}" />
+                    <Button Content="Validate" Command="{Binding ValidateCommand}" />
+                </StackPanel>
 
-        <Grid Grid.Row="2">
-            <Grid.RowDefinitions>
-                <RowDefinition Height="2*" />
-                <RowDefinition Height="*" />
-            </Grid.RowDefinitions>
+                <StackPanel Grid.Column="2" Orientation="Vertical" Spacing="2" HorizontalAlignment="Right">
+                    <TextBlock Text="{Binding CurrentPath}" Style="{StaticResource LabelTextBlockStyle}" TextTrimming="CharacterEllipsis" />
+                    <TextBlock Text="{Binding CurrentKind}" Foreground="{ThemeResource VscForegroundBrush}" />
+                </StackPanel>
+            </Grid>
+        </Border>
 
-            <ContentControl
-                Content="{Binding CurrentEditorVm}"
-                ContentTemplateSelector="{StaticResource EditorTemplateSelector}" />
-            <views:RawLinesView Grid.Row="1" DataContext="{Binding RawLinesViewModel}" />
+        <!-- Main workbench -->
+        <Grid Grid.Row="1" ColumnSpacing="0" RowSpacing="0">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="56" />
+                <ColumnDefinition Width="280" />
+                <ColumnDefinition Width="*" />
+            </Grid.ColumnDefinitions>
+
+            <!-- Activity bar -->
+            <StackPanel
+                Grid.Column="0"
+                Background="{ThemeResource VscPanelBrush}"
+                BorderBrush="{ThemeResource VscBorderBrush}"
+                BorderThickness="0,0,1,0"
+                VerticalAlignment="Stretch"
+                Padding="8"
+                Spacing="8">
+                <ToggleButton
+                    Content=""
+                    FontFamily="Segoe Fluent Icons"
+                    ToolTipService.ToolTip="Explorer"
+                    IsChecked="{Binding ActiveSidebarTab, Mode=TwoWay, Converter={StaticResource EnumEqualsConverter}, ConverterParameter=Explorer}" />
+                <ToggleButton
+                    Content=""
+                    FontFamily="Segoe Fluent Icons"
+                    ToolTipService.ToolTip="Search"
+                    IsChecked="{Binding ActiveSidebarTab, Mode=TwoWay, Converter={StaticResource EnumEqualsConverter}, ConverterParameter=Search}" />
+                <ToggleButton
+                    Content=""
+                    FontFamily="Segoe Fluent Icons"
+                    ToolTipService.ToolTip="Problems"
+                    IsChecked="{Binding ActiveSidebarTab, Mode=TwoWay, Converter={StaticResource EnumEqualsConverter}, ConverterParameter=Problems}" />
+            </StackPanel>
+
+            <!-- Sidebar -->
+            <Border
+                Grid.Column="1"
+                Background="{ThemeResource VscSurfaceBrush}"
+                BorderBrush="{ThemeResource VscBorderBrush}"
+                BorderThickness="0,0,1,0"
+                Padding="12">
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="*" />
+                    </Grid.RowDefinitions>
+                    <TextBlock Text="Sidebar" Style="{StaticResource LabelTextBlockStyle}" />
+                    <Grid Grid.Row="1">
+                        <StackPanel
+                            Visibility="{Binding ActiveSidebarTab, Converter={StaticResource EnumToVisibilityConverter}, ConverterParameter=Explorer}">
+                            <TextBlock Text="Document" Style="{StaticResource LabelTextBlockStyle}" Margin="0,0,0,8" />
+                            <StackPanel Background="{ThemeResource VscPanelBrush}" Padding="12" CornerRadius="8" Spacing="8">
+                                <TextBlock Text="Path" Style="{StaticResource LabelTextBlockStyle}" />
+                                <TextBlock Text="{Binding CurrentPath}" TextWrapping="Wrap" />
+                                <TextBlock Text="Kind" Style="{StaticResource LabelTextBlockStyle}" />
+                                <TextBlock Text="{Binding CurrentKind}" />
+                                <Button Content="Validate" Command="{Binding ValidateCommand}" />
+                            </StackPanel>
+                        </StackPanel>
+
+                        <views:FindReplacePanel
+                            x:Name="SidebarFindPanel"
+                            FocusRequestId="{Binding FocusFindRequestId, Mode=OneWay}"
+                            Visibility="{Binding ActiveSidebarTab, Converter={StaticResource EnumToVisibilityConverter}, ConverterParameter=Search}" />
+
+                        <StackPanel Visibility="{Binding ActiveSidebarTab, Converter={StaticResource EnumToVisibilityConverter}, ConverterParameter=Problems}">
+                            <TextBlock Text="Problems" Style="{StaticResource LabelTextBlockStyle}" Margin="0,0,0,8" />
+                            <Border
+                                Background="{ThemeResource VscPanelBrush}"
+                                BorderBrush="{ThemeResource VscBorderBrush}"
+                                BorderThickness="1"
+                                CornerRadius="8">
+                                <ListView
+                                    ItemsSource="{Binding Diagnostics}"
+                                    ItemClick="OnDiagnosticClicked"
+                                    IsItemClickEnabled="True"
+                                    SelectionMode="None"
+                                    ItemTemplate="{StaticResource DiagnosticTemplate}" />
+                            </Border>
+                        </StackPanel>
+                    </Grid>
+                </Grid>
+            </Border>
+
+            <!-- Editor area -->
+            <Grid Grid.Column="2" RowSpacing="8" Padding="12">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="*" />
+                    <RowDefinition Height="8" />
+                    <RowDefinition
+                        x:Name="BottomPanelRow"
+                        Height="{Binding BottomPanelHeight, Mode=TwoWay, Converter={StaticResource DoubleToGridLengthConverter}}" />
+                </Grid.RowDefinitions>
+
+                <Border
+                    Background="{ThemeResource VscSurfaceBrush}"
+                    BorderBrush="{ThemeResource VscBorderBrush}"
+                    BorderThickness="1"
+                    CornerRadius="8">
+                    <ContentControl
+                        Content="{Binding CurrentEditorVm}"
+                        ContentTemplateSelector="{StaticResource EditorTemplateSelector}" />
+                </Border>
+
+                <GridSplitter
+                    Grid.Row="1"
+                    HorizontalAlignment="Stretch"
+                    Background="{ThemeResource VscBorderBrush}"
+                    Height="8"
+                    ResizeDirection="Rows"
+                    ResizeBehavior="PreviousAndNext"
+                    DragCompleted="OnBottomSplitterDragCompleted" />
+
+                <Border
+                    x:Name="BottomPanelContainer"
+                    Grid.Row="2"
+                    Background="{ThemeResource VscSurfaceBrush}"
+                    BorderBrush="{ThemeResource VscBorderBrush}"
+                    BorderThickness="1"
+                    CornerRadius="8"
+                    Visibility="{Binding IsBottomPanelOpen, Converter={StaticResource BooleanToVisibilityConverter}}">
+                    <Grid>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto" />
+                            <RowDefinition Height="*" />
+                        </Grid.RowDefinitions>
+                        <Grid
+                            Grid.Row="0"
+                            Background="{ThemeResource VscPanelBrush}"
+                            BorderBrush="{ThemeResource VscBorderBrush}"
+                            BorderThickness="0,0,0,1"
+                            Padding="12"
+                            ColumnSpacing="8">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="Auto" />
+                                <ColumnDefinition Width="Auto" />
+                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="Auto" />
+                            </Grid.ColumnDefinitions>
+                            <TextBlock Text="Bottom panel" Style="{StaticResource LabelTextBlockStyle}" />
+                            <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="8">
+                                <ToggleButton
+                                    Content="Raw lines"
+                                    IsChecked="{Binding BottomPanelTab, Mode=TwoWay, Converter={StaticResource EnumEqualsConverter}, ConverterParameter=Raw}" />
+                                <ToggleButton
+                                    Content="Problems"
+                                    IsChecked="{Binding BottomPanelTab, Mode=TwoWay, Converter={StaticResource EnumEqualsConverter}, ConverterParameter=Problems}" />
+                            </StackPanel>
+                            <Border Grid.Column="2" />
+                            <Button
+                                Grid.Column="3"
+                                Content="Collapse"
+                                HorizontalAlignment="Right"
+                                Click="OnToggleBottomPanel" />
+                        </Grid>
+
+                        <Grid Grid.Row="1">
+                            <views:RawLinesView
+                                Visibility="{Binding BottomPanelTab, Converter={StaticResource EnumToVisibilityConverter}, ConverterParameter=Raw}"
+                                DataContext="{Binding RawLinesViewModel}" />
+
+                            <ListView
+                                Visibility="{Binding BottomPanelTab, Converter={StaticResource EnumToVisibilityConverter}, ConverterParameter=Problems}"
+                                ItemsSource="{Binding Diagnostics}"
+                                ItemTemplate="{StaticResource DiagnosticTemplate}"
+                                ItemClick="OnDiagnosticClicked"
+                                IsItemClickEnabled="True"
+                                SelectionMode="None" />
+
+                            <Grid Visibility="{Binding BottomPanelTab, Converter={StaticResource EnumToVisibilityConverter}, ConverterParameter=Problems}">
+                                <TextBlock
+                                    HorizontalAlignment="Center"
+                                    VerticalAlignment="Center"
+                                    Foreground="{ThemeResource VscMutedForegroundBrush}"
+                                    Text="No problems detected"
+                                    Visibility="{Binding Diagnostics.Count, Converter={StaticResource NoItemsVisibilityConverter}}">
+                                    <TextBlock.Transitions>
+                                        <TransitionCollection>
+                                            <EntranceThemeTransition />
+                                        </TransitionCollection>
+                                    </TextBlock.Transitions>
+                                </TextBlock>
+                            </Grid>
+                        </Grid>
+                    </Grid>
+                </Border>
+            </Grid>
         </Grid>
 
-        <Expander Grid.Row="3" Header="Problems" IsExpanded="True">
-            <ListView
-                ItemsSource="{Binding Diagnostics}"
-                SelectionChanged="OnDiagnosticSelected"
-                IsItemClickEnabled="True">
-                <ListView.ItemTemplate>
-                    <DataTemplate>
-                        <StackPanel Orientation="Horizontal" Spacing="8">
-                            <TextBlock Text="{Binding Severity}" Width="80" />
-                            <TextBlock Text="{Binding Code}" Width="80" />
-                            <TextBlock Text="{Binding Message}" TextWrapping="Wrap" />
-                            <TextBlock Text="{Binding Span.LineIndex}" Margin="8,0,0,0" />
-                        </StackPanel>
-                    </DataTemplate>
-                </ListView.ItemTemplate>
-            </ListView>
-        </Expander>
-
-        <StackPanel Grid.Row="4" Orientation="Horizontal" Spacing="12" Padding="12,4">
-            <TextBlock Text="{Binding CurrentPath}" />
-            <TextBlock Text="{Binding CurrentKind}" />
-        </StackPanel>
+        <!-- Status bar -->
+        <Grid
+            Grid.Row="2"
+            Style="{StaticResource StatusBarStyle}"
+            BorderBrush="{ThemeResource VscBorderBrush}"
+            BorderThickness="0,1,0,0">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="Auto" />
+                <ColumnDefinition Width="Auto" />
+            </Grid.ColumnDefinitions>
+            <TextBlock Text="{Binding CurrentPath}" Style="{StaticResource LabelTextBlockStyle}" TextTrimming="CharacterEllipsis" />
+            <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="12">
+                <TextBlock Text="{Binding CurrentKind}" />
+            </StackPanel>
+            <Border
+                Grid.Column="2"
+                Background="{ThemeResource VscPanelBrush}"
+                CornerRadius="10"
+                Padding="10,4"
+                Margin="8,0,0,0">
+                <TextBlock Text="{Binding Diagnostics.Count, StringFormat='{}{0} issues'}" />
+            </Border>
+        </Grid>
     </Grid>
 </Window>

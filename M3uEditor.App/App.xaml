@@ -2,12 +2,143 @@
     x:Class="M3uEditor.App.App"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-    xmlns:local="using:M3uEditor.App">
+    xmlns:local="using:M3uEditor.App"
+    xmlns:converters="using:M3uEditor.App.Converters">
     <Application.Resources>
         <ResourceDictionary>
             <ResourceDictionary.MergedDictionaries>
                 <XamlControlsResources xmlns="using:Microsoft.UI.Xaml.Controls" />
             </ResourceDictionary.MergedDictionaries>
+
+            <!-- VS Code inspired palette -->
+            <Color x:Key="VscBackgroundColor">#FF1F2430</Color>
+            <Color x:Key="VscSurfaceColor">#FF262C36</Color>
+            <Color x:Key="VscPanelColor">#FF2F3542</Color>
+            <Color x:Key="VscBorderColor">#FF3E4451</Color>
+            <Color x:Key="VscForegroundColor">#FFE6E6E6</Color>
+            <Color x:Key="VscMutedForegroundColor">#FF9DA5B4</Color>
+            <Color x:Key="VscAccentColor">#FF3BAFDA</Color>
+            <Color x:Key="VscErrorColor">#FFE16F7E</Color>
+            <Color x:Key="VscWarningColor">#FFE8C07D</Color>
+            <Color x:Key="VscInfoColor">#FF6CB4FF</Color>
+
+            <SolidColorBrush x:Key="VscBackgroundBrush" Color="{StaticResource VscBackgroundColor}" />
+            <SolidColorBrush x:Key="VscSurfaceBrush" Color="{StaticResource VscSurfaceColor}" />
+            <SolidColorBrush x:Key="VscPanelBrush" Color="{StaticResource VscPanelColor}" />
+            <SolidColorBrush x:Key="VscBorderBrush" Color="{StaticResource VscBorderColor}" />
+            <SolidColorBrush x:Key="VscForegroundBrush" Color="{StaticResource VscForegroundColor}" />
+            <SolidColorBrush x:Key="VscMutedForegroundBrush" Color="{StaticResource VscMutedForegroundColor}" />
+            <SolidColorBrush x:Key="VscAccentBrush" Color="{StaticResource VscAccentColor}" />
+            <SolidColorBrush x:Key="VscErrorBrush" Color="{StaticResource VscErrorColor}" />
+            <SolidColorBrush x:Key="VscWarningBrush" Color="{StaticResource VscWarningColor}" />
+            <SolidColorBrush x:Key="VscInfoBrush" Color="{StaticResource VscInfoColor}" />
+
+            <!-- Converters -->
+            <converters:EnumEqualsConverter x:Key="EnumEqualsConverter" />
+            <converters:DoubleToGridLengthConverter x:Key="DoubleToGridLengthConverter" />
+            <converters:DiagnosticSeverityToBrushConverter
+                x:Key="DiagnosticSeverityToBrushConverter"
+                ErrorBrush="{StaticResource VscErrorBrush}"
+                WarningBrush="{StaticResource VscWarningBrush}"
+                InfoBrush="{StaticResource VscInfoBrush}" />
+            <converters:EnumToVisibilityConverter x:Key="EnumToVisibilityConverter" />
+            <converters:CountToVisibilityConverter x:Key="HasItemsVisibilityConverter" />
+            <converters:CountToVisibilityConverter x:Key="NoItemsVisibilityConverter" Invert="True" />
+            <BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter" />
+
+            <!-- Typography -->
+            <FontFamily x:Key="MonoFontFamily">Consolas</FontFamily>
+
+            <!-- Text styles -->
+            <Style x:Key="TitleTextBlockStyle" TargetType="TextBlock">
+                <Setter Property="FontSize" Value="18" />
+                <Setter Property="FontWeight" Value="SemiBold" />
+                <Setter Property="Foreground" Value="{StaticResource VscForegroundBrush}" />
+            </Style>
+
+            <Style x:Key="LabelTextBlockStyle" TargetType="TextBlock">
+                <Setter Property="FontSize" Value="14" />
+                <Setter Property="Foreground" Value="{StaticResource VscMutedForegroundBrush}" />
+            </Style>
+
+            <Style x:Key="MonoTextBlockStyle" TargetType="TextBlock">
+                <Setter Property="FontFamily" Value="{StaticResource MonoFontFamily}" />
+                <Setter Property="Foreground" Value="{StaticResource VscForegroundBrush}" />
+            </Style>
+
+            <!-- Command surfaces -->
+            <Style TargetType="CommandBar">
+                <Setter Property="Background" Value="{StaticResource VscSurfaceBrush}" />
+                <Setter Property="Foreground" Value="{StaticResource VscForegroundBrush}" />
+                <Setter Property="BorderBrush" Value="{StaticResource VscBorderBrush}" />
+                <Setter Property="BorderThickness" Value="0,0,0,1" />
+                <Setter Property="Padding" Value="12,8" />
+            </Style>
+
+            <Style TargetType="AppBarButton">
+                <Setter Property="Foreground" Value="{StaticResource VscForegroundBrush}" />
+                <Setter Property="Background" Value="Transparent" />
+                <Setter Property="CornerRadius" Value="6" />
+                <Setter Property="Margin" Value="4,0" />
+                <Setter Property="BorderBrush" Value="Transparent" />
+                <Setter Property="BorderThickness" Value="1" />
+                <Setter Property="Width" Value="96" />
+                <Setter Property="HorizontalAlignment" Value="Center" />
+            </Style>
+
+            <Style TargetType="ListViewItem">
+                <Setter Property="Background" Value="Transparent" />
+                <Setter Property="Foreground" Value="{StaticResource VscForegroundBrush}" />
+                <Setter Property="BorderBrush" Value="Transparent" />
+                <Setter Property="BorderThickness" Value="1" />
+                <Setter Property="CornerRadius" Value="6" />
+                <Setter Property="Padding" Value="8,4" />
+                <Setter Property="HorizontalContentAlignment" Value="Stretch" />
+                <Setter Property="Template">
+                    <Setter.Value>
+                        <ControlTemplate TargetType="ListViewItem">
+                            <ListViewItemPresenter
+                                ContentTransitions="{TemplateBinding ContentTransitions}"
+                                SelectionCheckMarkVisualEnabled="False"
+                                CheckBrush="{ThemeResource VscAccentBrush}"
+                                Background="{TemplateBinding Background}"
+                                BorderBrush="{TemplateBinding BorderBrush}"
+                                BorderThickness="{TemplateBinding BorderThickness}"
+                                CornerRadius="{TemplateBinding CornerRadius}"
+                                Padding="{TemplateBinding Padding}"
+                                SelectedBackground="#222C7CFF"
+                                SelectedBorderBrush="{StaticResource VscAccentBrush}"
+                                PointerOverBackground="#11FFFFFF"
+                                PointerOverBorderBrush="{StaticResource VscBorderBrush}" />
+                        </ControlTemplate>
+                    </Setter.Value>
+                </Setter>
+            </Style>
+
+            <!-- Inputs -->
+            <Style TargetType="TextBox">
+                <Setter Property="Background" Value="{StaticResource VscSurfaceBrush}" />
+                <Setter Property="Foreground" Value="{StaticResource VscForegroundBrush}" />
+                <Setter Property="BorderBrush" Value="{StaticResource VscBorderBrush}" />
+                <Setter Property="BorderThickness" Value="1" />
+                <Setter Property="CornerRadius" Value="4" />
+                <Setter Property="SelectionHighlightColor" Value="{StaticResource VscAccentBrush}" />
+            </Style>
+
+            <Style TargetType="Button">
+                <Setter Property="Background" Value="{StaticResource VscAccentBrush}" />
+                <Setter Property="Foreground" Value="White" />
+                <Setter Property="BorderBrush" Value="{StaticResource VscBorderBrush}" />
+                <Setter Property="BorderThickness" Value="0" />
+                <Setter Property="CornerRadius" Value="4" />
+                <Setter Property="Padding" Value="12,6" />
+            </Style>
+
+            <!-- Status bar -->
+            <Style x:Key="StatusBarStyle" TargetType="Grid">
+                <Setter Property="Background" Value="{StaticResource VscSurfaceBrush}" />
+                <Setter Property="Padding" Value="12,4" />
+            </Style>
         </ResourceDictionary>
     </Application.Resources>
 </Application>

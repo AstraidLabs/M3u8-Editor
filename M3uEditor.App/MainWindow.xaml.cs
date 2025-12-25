@@ -2,6 +2,7 @@ using M3uEditor.App.ViewModels;
 using M3uEditor.Core;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
+using Microsoft.UI.Xaml.Controls.Primitives;
 using Microsoft.UI.Xaml.Input;
 
 namespace M3uEditor.App;
@@ -41,13 +42,17 @@ public sealed partial class MainWindow : Window
 
     private void OnFindInvoked(KeyboardAccelerator sender, KeyboardAcceleratorInvokedEventArgs args)
     {
-        ViewModel.ShowFindReplaceCommand.Execute(null);
+        ViewModel.ActiveSidebarTab = SidebarTab.Search;
+        ViewModel.IsFindReplaceOpen = true;
+        ViewModel.RequestFindFocus();
         args.Handled = true;
     }
 
     private void OnReplaceInvoked(KeyboardAccelerator sender, KeyboardAcceleratorInvokedEventArgs args)
     {
-        ViewModel.ShowFindReplaceCommand.Execute(null);
+        ViewModel.ActiveSidebarTab = SidebarTab.Search;
+        ViewModel.IsFindReplaceOpen = true;
+        ViewModel.RequestFindFocus();
         args.Handled = true;
     }
 
@@ -62,6 +67,27 @@ public sealed partial class MainWindow : Window
         if (e.AddedItems.Count > 0 && e.AddedItems[0] is Diagnostic diagnostic)
         {
             ViewModel.NavigateDiagnosticCommand.Execute(diagnostic);
+        }
+    }
+
+    private void OnDiagnosticClicked(object sender, ItemClickEventArgs e)
+    {
+        if (e.ClickedItem is Diagnostic diagnostic)
+        {
+            ViewModel.NavigateDiagnosticCommand.Execute(diagnostic);
+        }
+    }
+
+    private void OnToggleBottomPanel(object sender, RoutedEventArgs e)
+    {
+        ViewModel.IsBottomPanelOpen = !ViewModel.IsBottomPanelOpen;
+    }
+
+    private void OnBottomSplitterDragCompleted(object sender, DragCompletedEventArgs e)
+    {
+        if (BottomPanelContainer is FrameworkElement element)
+        {
+            ViewModel.BottomPanelHeight = element.ActualHeight;
         }
     }
 }

@@ -2,65 +2,85 @@
     x:Class="M3uEditor.App.Views.HlsMasterEditorView"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
-    <Grid>
+    <Grid RowSpacing="12">
         <Grid.RowDefinitions>
             <RowDefinition Height="2*" />
             <RowDefinition Height="*" />
         </Grid.RowDefinitions>
-        <Grid>
-            <Grid.RowDefinitions>
-                <RowDefinition Height="Auto" />
-                <RowDefinition Height="*" />
-            </Grid.RowDefinitions>
-            <Grid Padding="12,8" ColumnSpacing="12">
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="*" />
-                    <ColumnDefinition Width="*" />
-                    <ColumnDefinition Width="2*" />
-                    <ColumnDefinition Width="3*" />
-                </Grid.ColumnDefinitions>
-                <TextBlock Grid.Column="0" Text="Bandwidth" FontWeight="SemiBold" />
-                <TextBlock Grid.Column="1" Text="Resolution" FontWeight="SemiBold" />
-                <TextBlock Grid.Column="2" Text="Codecs" FontWeight="SemiBold" />
-                <TextBlock Grid.Column="3" Text="URI" FontWeight="SemiBold" />
+        <Border
+            Background="{ThemeResource VscSurfaceBrush}"
+            BorderBrush="{ThemeResource VscBorderBrush}"
+            BorderThickness="1"
+            CornerRadius="8">
+            <Grid>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="*" />
+                </Grid.RowDefinitions>
+                <Grid
+                    Padding="12,8"
+                    ColumnSpacing="12"
+                    Background="{ThemeResource VscPanelBrush}"
+                    BorderBrush="{ThemeResource VscBorderBrush}"
+                    BorderThickness="0,0,0,1">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="2*" />
+                        <ColumnDefinition Width="3*" />
+                    </Grid.ColumnDefinitions>
+                    <TextBlock Grid.Column="0" Text="Bandwidth" FontWeight="SemiBold" Foreground="{ThemeResource VscMutedForegroundBrush}" />
+                    <TextBlock Grid.Column="1" Text="Resolution" FontWeight="SemiBold" Foreground="{ThemeResource VscMutedForegroundBrush}" />
+                    <TextBlock Grid.Column="2" Text="Codecs" FontWeight="SemiBold" Foreground="{ThemeResource VscMutedForegroundBrush}" />
+                    <TextBlock Grid.Column="3" Text="URI" FontWeight="SemiBold" Foreground="{ThemeResource VscMutedForegroundBrush}" />
+                </Grid>
+                <ListView
+                    Grid.Row="1"
+                    ItemsSource="{Binding Variants}"
+                    Padding="0"
+                    SelectedItem="{Binding SelectedVariant, Mode=TwoWay}"
+                    SelectionMode="Single">
+                    <ListView.ItemTemplate>
+                        <DataTemplate>
+                            <Grid Padding="12,6" ColumnSpacing="12">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*" />
+                                    <ColumnDefinition Width="*" />
+                                    <ColumnDefinition Width="2*" />
+                                    <ColumnDefinition Width="3*" />
+                                </Grid.ColumnDefinitions>
+                                <TextBlock Grid.Column="0" Text="{Binding Bandwidth}" />
+                                <TextBlock Grid.Column="1" Text="{Binding Resolution}" />
+                                <TextBlock Grid.Column="2" Text="{Binding Codecs}" />
+                                <TextBlock Grid.Column="3" Text="{Binding Url}" TextTrimming="CharacterEllipsis" />
+                            </Grid>
+                        </DataTemplate>
+                    </ListView.ItemTemplate>
+                </ListView>
             </Grid>
-            <ListView
-                Grid.Row="1"
-                ItemsSource="{Binding Variants}"
-                SelectedItem="{Binding SelectedVariant, Mode=TwoWay}"
-                SelectionMode="Single">
-                <ListView.ItemTemplate>
-                    <DataTemplate>
-                        <Grid Padding="12,6" ColumnSpacing="12">
-                            <Grid.ColumnDefinitions>
-                                <ColumnDefinition Width="*" />
-                                <ColumnDefinition Width="*" />
-                                <ColumnDefinition Width="2*" />
-                                <ColumnDefinition Width="3*" />
-                            </Grid.ColumnDefinitions>
-                            <TextBlock Grid.Column="0" Text="{Binding Bandwidth}" />
-                            <TextBlock Grid.Column="1" Text="{Binding Resolution}" />
-                            <TextBlock Grid.Column="2" Text="{Binding Codecs}" />
-                            <TextBlock Grid.Column="3" Text="{Binding Url}" TextTrimming="CharacterEllipsis" />
-                        </Grid>
-                    </DataTemplate>
-                </ListView.ItemTemplate>
-            </ListView>
-        </Grid>
-        <StackPanel Grid.Row="1" Orientation="Vertical" Spacing="8" Padding="8">
-            <StackPanel Orientation="Horizontal" Spacing="8">
-                <TextBlock Text="URL" Width="100" />
-                <TextBox Text="{Binding SelectedVariant.Url, Mode=TwoWay}" Width="400" />
-                <TextBlock Text="Bandwidth" Width="100" />
-                <TextBox Text="{Binding SelectedVariant.Bandwidth, Mode=TwoWay}" Width="120" />
+        </Border>
+        <Border
+            Grid.Row="1"
+            Background="{ThemeResource VscSurfaceBrush}"
+            BorderBrush="{ThemeResource VscBorderBrush}"
+            BorderThickness="1"
+            CornerRadius="8">
+            <StackPanel Orientation="Vertical" Spacing="10" Padding="12">
+                <TextBlock Text="Variant details" Style="{StaticResource LabelTextBlockStyle}" />
+                <StackPanel Orientation="Horizontal" Spacing="8">
+                    <TextBlock Text="URL" Width="100" />
+                    <TextBox Text="{Binding SelectedVariant.Url, Mode=TwoWay}" Width="400" />
+                    <TextBlock Text="Bandwidth" Width="100" />
+                    <TextBox Text="{Binding SelectedVariant.Bandwidth, Mode=TwoWay}" Width="120" />
+                </StackPanel>
+                <StackPanel Orientation="Horizontal" Spacing="8">
+                    <TextBlock Text="Resolution" Width="100" />
+                    <TextBox Text="{Binding SelectedVariant.Resolution, Mode=TwoWay}" Width="160" />
+                    <TextBlock Text="Codecs" Width="80" />
+                    <TextBox Text="{Binding SelectedVariant.Codecs, Mode=TwoWay}" Width="220" />
+                </StackPanel>
+                <Button Content="Apply" Command="{Binding ApplySelectedCommand}" HorizontalAlignment="Left" />
             </StackPanel>
-            <StackPanel Orientation="Horizontal" Spacing="8">
-                <TextBlock Text="Resolution" Width="100" />
-                <TextBox Text="{Binding SelectedVariant.Resolution, Mode=TwoWay}" Width="160" />
-                <TextBlock Text="Codecs" Width="80" />
-                <TextBox Text="{Binding SelectedVariant.Codecs, Mode=TwoWay}" Width="220" />
-            </StackPanel>
-            <Button Content="Apply" Command="{Binding ApplySelectedCommand}" HorizontalAlignment="Left" />
-        </StackPanel>
+        </Border>
     </Grid>
 </UserControl>
