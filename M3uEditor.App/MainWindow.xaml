@@ -5,6 +5,7 @@
     xmlns:vm="using:M3uEditor.App.ViewModels"
     xmlns:views="using:M3uEditor.App.Views"
     xmlns:controls="using:CommunityToolkit.WinUI.Controls"
+    xmlns:sizers="using:CommunityToolkit.WinUI.UI.Controls"
     xmlns:winui="using:Microsoft.UI.Xaml.Controls"
     Title="M3u Editor">
     <Grid x:Name="Root" Background="{ThemeResource VscBackgroundBrush}">
@@ -204,7 +205,7 @@
                         ContentTemplateSelector="{StaticResource EditorTemplateSelector}" />
                 </Border>
 
-                <winui:GridSplitter
+                <sizers:GridSplitter
                     Grid.Row="1"
                     HorizontalAlignment="Stretch"
                     Background="{ThemeResource VscBorderBrush}"
