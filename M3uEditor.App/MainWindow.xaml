@@ -213,6 +213,7 @@
                     ResizeBehavior="PreviousAndNext"
                     DragCompleted="OnBottomSplitterDragCompleted" />
 
+
                 <Border
                     x:Name="BottomPanelContainer"
                     Grid.Row="2"
