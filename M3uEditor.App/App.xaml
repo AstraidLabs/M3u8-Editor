@@ -12,27 +12,16 @@
             </ResourceDictionary.MergedDictionaries>
 
             <!-- VS Code inspired palette -->
-            <Color x:Key="VscBackgroundColor">#FF1F2430</Color>
-            <Color x:Key="VscSurfaceColor">#FF262C36</Color>
-            <Color x:Key="VscPanelColor">#FF2F3542</Color>
-            <Color x:Key="VscBorderColor">#FF3E4451</Color>
-            <Color x:Key="VscForegroundColor">#FFE6E6E6</Color>
-            <Color x:Key="VscMutedForegroundColor">#FF9DA5B4</Color>
-            <Color x:Key="VscAccentColor">#FF3BAFDA</Color>
-            <Color x:Key="VscErrorColor">#FFE16F7E</Color>
-            <Color x:Key="VscWarningColor">#FFE8C07D</Color>
-            <Color x:Key="VscInfoColor">#FF6CB4FF</Color>
-
-            <SolidColorBrush x:Key="VscBackgroundBrush" Color="{StaticResource VscBackgroundColor}" />
-            <SolidColorBrush x:Key="VscSurfaceBrush" Color="{StaticResource VscSurfaceColor}" />
-            <SolidColorBrush x:Key="VscPanelBrush" Color="{StaticResource VscPanelColor}" />
-            <SolidColorBrush x:Key="VscBorderBrush" Color="{StaticResource VscBorderColor}" />
-            <SolidColorBrush x:Key="VscForegroundBrush" Color="{StaticResource VscForegroundColor}" />
-            <SolidColorBrush x:Key="VscMutedForegroundBrush" Color="{StaticResource VscMutedForegroundColor}" />
-            <SolidColorBrush x:Key="VscAccentBrush" Color="{StaticResource VscAccentColor}" />
-            <SolidColorBrush x:Key="VscErrorBrush" Color="{StaticResource VscErrorColor}" />
-            <SolidColorBrush x:Key="VscWarningBrush" Color="{StaticResource VscWarningColor}" />
-            <SolidColorBrush x:Key="VscInfoBrush" Color="{StaticResource VscInfoColor}" />
+            <SolidColorBrush x:Key="VscBackgroundBrush" Color="#FF1F2430" />
+            <SolidColorBrush x:Key="VscSurfaceBrush" Color="#FF262C36" />
+            <SolidColorBrush x:Key="VscPanelBrush" Color="#FF2F3542" />
+            <SolidColorBrush x:Key="VscBorderBrush" Color="#FF3E4451" />
+            <SolidColorBrush x:Key="VscForegroundBrush" Color="#FFE6E6E6" />
+            <SolidColorBrush x:Key="VscMutedForegroundBrush" Color="#FF9DA5B4" />
+            <SolidColorBrush x:Key="VscAccentBrush" Color="#FF3BAFDA" />
+            <SolidColorBrush x:Key="VscErrorBrush" Color="#FFE16F7E" />
+            <SolidColorBrush x:Key="VscWarningBrush" Color="#FFE8C07D" />
+            <SolidColorBrush x:Key="VscInfoBrush" Color="#FF6CB4FF" />
 
             <!-- Converters -->
             <converters:EnumEqualsConverter x:Key="EnumEqualsConverter" />
