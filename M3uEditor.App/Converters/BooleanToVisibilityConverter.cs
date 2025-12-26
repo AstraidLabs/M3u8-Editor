@@ -9,12 +9,20 @@ public sealed class BooleanToVisibilityConverter : IValueConverter
 
     public object Convert(object value, Type targetType, object parameter, string language)
     {
-        var isVisible = value switch
+        bool isVisible;
+
+        if (value is bool boolValue)
         {
-            bool boolValue => boolValue,
-            bool? nullableBool => nullableBool ?? false,
-            _ => false
-        };
+            isVisible = boolValue;
+        }
+        else if (value is bool? nullableBool)
+        {
+            isVisible = nullableBool ?? false;
+        }
+        else
+        {
+            isVisible = false;
+        }
 
         if (Invert)
         {
