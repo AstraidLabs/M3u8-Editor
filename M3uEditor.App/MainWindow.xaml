@@ -211,8 +211,7 @@
                     Background="{ThemeResource VscBorderBrush}"
                     Height="8"
                     ResizeDirection="Rows"
-                    ResizeBehavior="PreviousAndNext"
-                    DragCompleted="OnBottomSplitterDragCompleted" />
+                    ResizeBehavior="PreviousAndNext"/>
 
 
                 <Border

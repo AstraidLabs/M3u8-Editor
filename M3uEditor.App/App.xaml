@@ -45,7 +45,7 @@
             <converters:EnumToVisibilityConverter x:Key="EnumToVisibilityConverter" />
             <converters:CountToVisibilityConverter x:Key="HasItemsVisibilityConverter" />
             <converters:CountToVisibilityConverter x:Key="NoItemsVisibilityConverter" Invert="True" />
-            <winui:BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter" />
+            <converters:BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter" />
 
             <!-- Typography -->
             <FontFamily x:Key="MonoFontFamily">Consolas</FontFamily>
