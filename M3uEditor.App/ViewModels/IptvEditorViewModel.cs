@@ -3,6 +3,7 @@ using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using M3uEditor.Core;
 using M3uEditor.Core.Editing;
+using M3uEditor.Core.Parsing.Editors;
 using M3uEditor.Core.Projection;
 
 namespace M3uEditor.App.ViewModels;
@@ -60,10 +61,10 @@ public partial class IptvEditorViewModel : ObservableObject
     [ObservableProperty]
     private IptvItemViewModel? selectedItem;
 
-    public IptvEditorViewModel(PlaylistDocument document)
+    public IptvEditorViewModel(PlaylistDocument document, ProjectionResult<IptvItem>? projection = null)
     {
         _document = document;
-        LoadItems(document);
+        LoadItems(document, projection);
     }
 
     [RelayCommand]
@@ -104,11 +105,11 @@ public partial class IptvEditorViewModel : ObservableObject
         PlaylistEditor.UpdateIptvMetadata(_document, SelectedItem.UriLineIndex, SelectedItem.Duration, SelectedItem.Title, attributes);
     }
 
-    private void LoadItems(PlaylistDocument document)
+    private void LoadItems(PlaylistDocument document, ProjectionResult<IptvItem>? projection)
     {
         Items.Clear();
-        var projection = PlaylistProjectionBuilder.BuildIptvItems(document);
-        foreach (var item in projection.Items)
+        var projectionData = projection ?? new IptvEditorParser().Parse(document);
+        foreach (var item in projectionData.Items)
         {
             var duration = item.ExtInfLineIndex is int extIndex && document.Lines[extIndex] is TagLine tagLine
                 ? ParseDuration(tagLine.TagValue)

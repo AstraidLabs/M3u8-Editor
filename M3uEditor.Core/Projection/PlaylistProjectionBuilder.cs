@@ -1,4 +1,5 @@
-using System.Globalization;
+using M3uEditor.Core;
+using M3uEditor.Core.Parsing.Editors;
 
 namespace M3uEditor.Core.Projection;
 
@@ -44,180 +45,20 @@ public sealed class HlsMediaProjection
     public ProjectionResult<HlsMediaSegment> Segments { get; } = new();
 }
 
-public static class PlaylistProjectionBuilder
+internal static class PlaylistProjectionBuilder
 {
-    public static ProjectionResult<IptvItem> BuildIptvItems(PlaylistDocument document)
+    internal static ProjectionResult<IptvItem> BuildIptvItems(PlaylistDocument document)
     {
-        var projection = new ProjectionResult<IptvItem>();
-        for (var i = 0; i < document.Lines.Count; i++)
-        {
-            if (document.Lines[i] is TagLine tag
-                && tag.TagName.Equals("EXTINF", StringComparison.OrdinalIgnoreCase)
-                && i + 1 < document.Lines.Count
-                && document.Lines[i + 1] is UriLine uri)
-            {
-                var metadata = ParseExtInf(tag.TagValue);
-                var item = new IptvItem
-                {
-                    ExtInfLineIndex = i,
-                    UriLineIndex = i + 1,
-                    Title = metadata.Title,
-                    Url = uri.Value,
-                    Attributes = metadata.Attributes
-                };
-
-                var index = projection.Items.Count;
-                projection.Items.Add(item);
-                projection.LineToItem[i] = index;
-                projection.LineToItem[i + 1] = index;
-                i++; // skip URI line
-            }
-            else if (document.Lines[i] is UriLine uriLine)
-            {
-                var item = new IptvItem
-                {
-                    ExtInfLineIndex = null,
-                    UriLineIndex = i,
-                    Title = string.Empty,
-                    Url = uriLine.Value,
-                    Attributes = new AttributeCollection()
-                };
-
-                var index = projection.Items.Count;
-                projection.Items.Add(item);
-                projection.LineToItem[i] = index;
-            }
-        }
-
-        return projection;
+        return new IptvEditorParser().Parse(document);
     }
 
-    public static ProjectionResult<HlsMasterVariant> BuildHlsMasterItems(PlaylistDocument document)
+    internal static ProjectionResult<HlsMasterVariant> BuildHlsMasterItems(PlaylistDocument document)
     {
-        var projection = new ProjectionResult<HlsMasterVariant>();
-
-        for (var i = 0; i < document.Lines.Count; i++)
-        {
-            if (document.Lines[i] is TagLine tagLine &&
-                tagLine.TagName.Equals("EXT-X-STREAM-INF", StringComparison.OrdinalIgnoreCase) &&
-                i + 1 < document.Lines.Count &&
-                document.Lines[i + 1] is UriLine uriLine)
-            {
-                var attributes = AttributeHelper.ParseAttributeList(tagLine.TagValue ?? string.Empty, ',', includeEmpty: true);
-                var variant = new HlsMasterVariant
-                {
-                    StreamInfLineIndex = i,
-                    UriLineIndex = i + 1,
-                    Url = uriLine.Value,
-                    Attributes = attributes
-                };
-
-                var index = projection.Items.Count;
-                projection.Items.Add(variant);
-                projection.LineToItem[i] = index;
-                projection.LineToItem[i + 1] = index;
-                i++;
-            }
-        }
-
-        return projection;
+        return new HlsMasterEditorParser().Parse(document);
     }
 
-    public static HlsMediaProjection BuildHlsMediaSegments(PlaylistDocument document)
+    internal static HlsMediaProjection BuildHlsMediaSegments(PlaylistDocument document)
     {
-        var projection = new HlsMediaProjection();
-        var leadingTags = new List<int>();
-        var headerComplete = false;
-
-        for (var i = 0; i < document.Lines.Count; i++)
-        {
-            if (document.Lines[i] is TagLine tagLine)
-            {
-                if (IsLeadingTag(tagLine.TagName))
-                {
-                    leadingTags.Add(i);
-                    if (!headerComplete)
-                    {
-                        projection.HeaderTagIndices.Add(i);
-                    }
-
-                    continue;
-                }
-
-                if (tagLine.TagName.Equals("EXTINF", StringComparison.OrdinalIgnoreCase)
-                    && i + 1 < document.Lines.Count
-                    && document.Lines[i + 1] is UriLine uriLine)
-                {
-                    var metadata = ParseExtInf(tagLine.TagValue);
-                    var segment = new HlsMediaSegment
-                    {
-                        ExtInfLineIndex = i,
-                        UriLineIndex = i + 1,
-                        LeadingTagIndices = leadingTags.ToList(),
-                        Duration = metadata.Duration,
-                        Title = metadata.Title,
-                        Uri = uriLine.Value
-                    };
-
-                    var index = projection.Segments.Items.Count;
-                    projection.Segments.Items.Add(segment);
-                    projection.Segments.LineToItem[i] = index;
-                    projection.Segments.LineToItem[i + 1] = index;
-                    foreach (var tagIndex in leadingTags)
-                    {
-                        projection.Segments.LineToItem[tagIndex] = index;
-                    }
-
-                    leadingTags.Clear();
-                    headerComplete = true;
-                    i++;
-                }
-            }
-        }
-
-        return projection;
-    }
-
-    private static bool IsLeadingTag(string tagName)
-    {
-        return tagName.Equals("EXT-X-KEY", StringComparison.OrdinalIgnoreCase)
-               || tagName.Equals("EXT-X-BYTERANGE", StringComparison.OrdinalIgnoreCase)
-               || tagName.Equals("EXT-X-DISCONTINUITY", StringComparison.OrdinalIgnoreCase)
-               || tagName.Equals("EXT-X-PROGRAM-DATE-TIME", StringComparison.OrdinalIgnoreCase)
-               || tagName.Equals("EXT-X-MAP", StringComparison.OrdinalIgnoreCase);
-    }
-
-    private static ExtInfInfo ParseExtInf(string? tagValue)
-    {
-        var info = new ExtInfInfo();
-        if (string.IsNullOrEmpty(tagValue))
-        {
-            return info;
-        }
-
-        var commaIndex = tagValue.IndexOf(',');
-        var head = commaIndex >= 0 ? tagValue[..commaIndex] : tagValue;
-        info.Title = commaIndex >= 0 ? tagValue[(commaIndex + 1)..] : string.Empty;
-
-        var spaceIndex = head.IndexOf(' ');
-        var durationText = spaceIndex >= 0 ? head[..spaceIndex] : head;
-        var attributeText = spaceIndex >= 0 ? head[(spaceIndex + 1)..] : string.Empty;
-
-        if (double.TryParse(durationText.Trim(), NumberStyles.Float, CultureInfo.InvariantCulture, out var parsed))
-        {
-            info.Duration = parsed;
-        }
-
-        info.Attributes = AttributeHelper.ParseAttributeList(attributeText, ' ', includeEmpty: false);
-        return info;
-    }
-
-    private sealed class ExtInfInfo
-    {
-        public double? Duration { get; set; }
-
-        public string Title { get; set; } = string.Empty;
-
-        public AttributeCollection Attributes { get; set; } = new();
+        return new HlsMediaEditorParser().Parse(document);
     }
 }

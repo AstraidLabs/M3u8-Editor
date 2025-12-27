@@ -1,4 +1,5 @@
 using System.Globalization;
+using M3uEditor.Core.Parsing.Helpers;
 
 namespace M3uEditor.Core.Analysis;
 
@@ -67,7 +68,7 @@ public static class PlaylistAnalyzer
             }
         }
 
-        double? pendingDuration = null;
+        var pendingDurations = new Dictionary<int, (double Duration, int ExtInfIndex)>();
         for (var i = 0; i < document.Lines.Count; i++)
         {
             var line = document.Lines[i];
@@ -75,21 +76,23 @@ public static class PlaylistAnalyzer
             {
                 if (TryParseDuration(tag.TagValue, out var duration))
                 {
-                    pendingDuration = duration;
+                    var uriIndex = PlaylistLineNavigator.FindNextUriLineIndex(document.Lines, i);
+                    if (uriIndex >= 0)
+                    {
+                        pendingDurations[uriIndex] = (duration, i);
+                    }
                 }
             }
-            else if (line is UriLine && pendingDuration is not null)
+            else if (line is UriLine && pendingDurations.TryGetValue(i, out var segment))
             {
-                if (targetDuration is not null && pendingDuration.Value > targetDuration.Value)
+                if (targetDuration is not null && segment.Duration > targetDuration.Value)
                 {
                     diagnostics.Add(new Diagnostic(
                         DiagnosticSeverity.Warning,
                         "HLS004",
-                        $"Segment duration {pendingDuration.Value.ToString(CultureInfo.InvariantCulture)} exceeds TARGETDURATION {targetDuration.Value.ToString(CultureInfo.InvariantCulture)}.",
-                        new TextSpan(i - 1, 0, document.Lines[i - 1].Raw.Length)));
+                        $"Segment duration {segment.Duration.ToString(CultureInfo.InvariantCulture)} exceeds TARGETDURATION {targetDuration.Value.ToString(CultureInfo.InvariantCulture)}.",
+                        new TextSpan(segment.ExtInfIndex, 0, document.Lines[segment.ExtInfIndex].Raw.Length)));
                 }
-
-                pendingDuration = null;
             }
         }
     }
@@ -119,13 +122,12 @@ public static class PlaylistAnalyzer
     private static bool TryParseDuration(string? extInfValue, out double duration)
     {
         duration = 0;
-        if (string.IsNullOrWhiteSpace(extInfValue))
+        if (!ExtInfParser.TryParse(extInfValue, out var parsed, out _, out _))
         {
             return false;
         }
 
-        var comma = extInfValue.IndexOf(',');
-        var head = comma >= 0 ? extInfValue[..comma] : extInfValue;
-        return double.TryParse(head.Trim(), NumberStyles.Float, CultureInfo.InvariantCulture, out duration);
+        duration = parsed ?? 0;
+        return true;
     }
 }
