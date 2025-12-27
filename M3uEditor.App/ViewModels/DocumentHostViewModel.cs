@@ -10,6 +10,7 @@ using M3uEditor.Core;
 using M3uEditor.Core.Analysis;
 using M3uEditor.Core.FindReplace;
 using M3uEditor.Core.Parsing;
+using M3uEditor.Core.Parsing.Editors;
 using M3uEditor.Core.Projection;
 using M3uEditor.Core.Writing;
 using Microsoft.UI.Dispatching;
@@ -38,6 +39,7 @@ public partial class DocumentHostViewModel : ObservableObject
 {
     private Window? _window;
     private double _lastOpenBottomHeight = 240;
+    private readonly IEditorParserDispatcher _editorParserDispatcher = new EditorParserDispatcher();
 
     [ObservableProperty]
     private PlaylistDocument? document;
@@ -245,10 +247,10 @@ public partial class DocumentHostViewModel : ObservableObject
     {
         currentEditorVm = document.DetectedKind switch
         {
-            PlaylistKind.HlsMaster => new HlsMasterEditorViewModel(document),
-            PlaylistKind.HlsMedia => new HlsMediaEditorViewModel(document),
-            PlaylistKind.ExtendedM3u => new IptvEditorViewModel(document),
-            _ => new IptvEditorViewModel(document)
+            PlaylistKind.HlsMaster => new HlsMasterEditorViewModel(document, _editorParserDispatcher.GetParserFor<ProjectionResult<HlsMasterVariant>>(document.DetectedKind)?.Parse(document)),
+            PlaylistKind.HlsMedia => new HlsMediaEditorViewModel(document, _editorParserDispatcher.GetParserFor<HlsMediaProjection>(document.DetectedKind)?.Parse(document)),
+            PlaylistKind.ExtendedM3u => new IptvEditorViewModel(document, _editorParserDispatcher.GetParserFor<ProjectionResult<IptvItem>>(document.DetectedKind)?.Parse(document)),
+            _ => new IptvEditorViewModel(document, _editorParserDispatcher.GetParserFor<ProjectionResult<IptvItem>>(document.DetectedKind)?.Parse(document))
         };
         OnPropertyChanged(nameof(CurrentEditorVm));
     }

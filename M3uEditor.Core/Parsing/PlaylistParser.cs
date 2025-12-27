@@ -1,10 +1,13 @@
 using System.Globalization;
+using M3uEditor.Core.Parsing.Helpers;
 
 namespace M3uEditor.Core.Parsing;
 
-public static class PlaylistParser
+public class PlaylistParser : IPlaylistParser, IKindDetector
 {
-    public static PlaylistDocument Parse(string text)
+    public static PlaylistDocument Parse(string text) => new PlaylistParser().Parse(text);
+
+    public PlaylistDocument Parse(string text)
     {
         var document = new PlaylistDocument();
         var workingText = text ?? string.Empty;
@@ -31,43 +34,7 @@ public static class PlaylistParser
         return document;
     }
 
-    private static string DetectNewLine(string text)
-    {
-        var firstCarriageReturn = text.IndexOf("\r\n", StringComparison.Ordinal);
-        return firstCarriageReturn >= 0 ? "\r\n" : "\n";
-    }
-
-    private static LineNode CreateNode(string raw, int lineNumber)
-    {
-        if (string.IsNullOrEmpty(raw))
-        {
-            return new BlankLine { Raw = raw, LineNumber = lineNumber };
-        }
-
-        if (raw.StartsWith("#EXT", StringComparison.OrdinalIgnoreCase))
-        {
-            var tagBody = raw[1..];
-            var separatorIndex = tagBody.IndexOf(':');
-            var tagName = separatorIndex >= 0 ? tagBody[..separatorIndex].Trim() : tagBody.Trim();
-            var tagValue = separatorIndex >= 0 ? tagBody[(separatorIndex + 1)..] : null;
-            return new TagLine
-            {
-                Raw = raw,
-                LineNumber = lineNumber,
-                TagName = tagName,
-                TagValue = tagValue
-            };
-        }
-
-        if (raw.StartsWith("#"))
-        {
-            return new CommentLine { Raw = raw, LineNumber = lineNumber };
-        }
-
-        return new UriLine { Raw = raw, LineNumber = lineNumber, Value = raw };
-    }
-
-    private static PlaylistKind DetectKind(IEnumerable<LineNode> nodes)
+    public PlaylistKind DetectKind(IReadOnlyList<LineNode> nodes)
     {
         var hasExtX = false;
         var hasStreamInf = false;
@@ -109,7 +76,43 @@ public static class PlaylistParser
         return PlaylistKind.PlainM3u;
     }
 
-    private static void AnalyzeSyntax(PlaylistDocument document)
+    private static string DetectNewLine(string text)
+    {
+        var firstCarriageReturn = text.IndexOf("\r\n", StringComparison.Ordinal);
+        return firstCarriageReturn >= 0 ? "\r\n" : "\n";
+    }
+
+    private static LineNode CreateNode(string raw, int lineNumber)
+    {
+        if (string.IsNullOrEmpty(raw))
+        {
+            return new BlankLine { Raw = raw, LineNumber = lineNumber };
+        }
+
+        if (raw.StartsWith("#EXT", StringComparison.OrdinalIgnoreCase))
+        {
+            var tagBody = raw[1..];
+            var separatorIndex = tagBody.IndexOf(':');
+            var tagName = separatorIndex >= 0 ? tagBody[..separatorIndex].Trim() : tagBody.Trim();
+            var tagValue = separatorIndex >= 0 ? tagBody[(separatorIndex + 1)..] : null;
+            return new TagLine
+            {
+                Raw = raw,
+                LineNumber = lineNumber,
+                TagName = tagName,
+                TagValue = tagValue
+            };
+        }
+
+        if (raw.StartsWith("#"))
+        {
+            return new CommentLine { Raw = raw, LineNumber = lineNumber };
+        }
+
+        return new UriLine { Raw = raw, LineNumber = lineNumber, Value = raw };
+    }
+
+    private void AnalyzeSyntax(PlaylistDocument document)
     {
         var lines = document.Lines;
         var hasTargetDuration = false;
@@ -150,7 +153,8 @@ public static class PlaylistParser
                 case TagLine tag:
                     if (tag.TagName.Equals("EXTINF", StringComparison.OrdinalIgnoreCase))
                     {
-                        if (i + 1 >= lines.Count || lines[i + 1] is not UriLine)
+                        var uriIndex = PlaylistLineNavigator.FindNextUriLineIndex(lines, i);
+                        if (uriIndex < 0 || lines[uriIndex] is not UriLine)
                         {
                             document.Diagnostics.Add(new Diagnostic(
                                 DiagnosticSeverity.Error,
@@ -163,7 +167,8 @@ public static class PlaylistParser
                     }
                     else if (tag.TagName.Equals("EXT-X-STREAM-INF", StringComparison.OrdinalIgnoreCase))
                     {
-                        if (i + 1 >= lines.Count || lines[i + 1] is not UriLine)
+                        var uriIndex = PlaylistLineNavigator.FindNextUriLineIndex(lines, i);
+                        if (uriIndex < 0 || lines[uriIndex] is not UriLine)
                         {
                             document.Diagnostics.Add(new Diagnostic(
                                 DiagnosticSeverity.Error,
@@ -236,16 +241,14 @@ public static class PlaylistParser
         }
     }
 
-    private static void ValidateExtInfDuration(PlaylistDocument document, TagLine tag, int lineIndex)
+    private void ValidateExtInfDuration(PlaylistDocument document, TagLine tag, int lineIndex)
     {
-        if (tag.TagValue is null)
+        if (string.IsNullOrEmpty(tag.TagValue))
         {
             return;
         }
 
-        var commaIndex = tag.TagValue.IndexOf(',');
-        var head = commaIndex >= 0 ? tag.TagValue[..commaIndex] : tag.TagValue;
-        var durationText = head.TrimStart();
+        var hasDuration = ExtInfParser.TryParse(tag.TagValue, out var duration, out _, out _);
 
         var errorCode = document.DetectedKind == PlaylistKind.HlsMedia || document.DetectedKind == PlaylistKind.HlsMaster
             ? "HLSINF"
@@ -256,17 +259,14 @@ public static class PlaylistParser
 
         if (document.DetectedKind == PlaylistKind.HlsMedia || document.DetectedKind == PlaylistKind.HlsMaster)
         {
-            if (!double.TryParse(durationText, NumberStyles.Float, CultureInfo.InvariantCulture, out _))
+            if (!hasDuration || duration is null)
             {
                 document.Diagnostics.Add(new Diagnostic(severity, errorCode, "Invalid HLS EXTINF duration.", span));
             }
         }
-        else
+        else if (!hasDuration)
         {
-            if (!int.TryParse(durationText, NumberStyles.Integer, CultureInfo.InvariantCulture, out _))
-            {
-                document.Diagnostics.Add(new Diagnostic(severity, errorCode, "Invalid IPTV EXTINF duration.", span));
-            }
+            document.Diagnostics.Add(new Diagnostic(severity, errorCode, "Invalid IPTV EXTINF duration.", span));
         }
     }
 

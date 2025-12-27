@@ -3,6 +3,7 @@ using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using M3uEditor.Core;
 using M3uEditor.Core.Editing;
+using M3uEditor.Core.Parsing.Editors;
 using M3uEditor.Core.Projection;
 
 namespace M3uEditor.App.ViewModels;
@@ -49,10 +50,10 @@ public partial class HlsMasterEditorViewModel : ObservableObject
     [ObservableProperty]
     private HlsMasterVariantViewModel? selectedVariant;
 
-    public HlsMasterEditorViewModel(PlaylistDocument document)
+    public HlsMasterEditorViewModel(PlaylistDocument document, ProjectionResult<HlsMasterVariant>? projection = null)
     {
         _document = document;
-        Load(document);
+        Load(document, projection);
     }
 
     [RelayCommand]
@@ -81,11 +82,11 @@ public partial class HlsMasterEditorViewModel : ObservableObject
         }
     }
 
-    private void Load(PlaylistDocument document)
+    private void Load(PlaylistDocument document, ProjectionResult<HlsMasterVariant>? projection)
     {
         Variants.Clear();
-        var projection = PlaylistProjectionBuilder.BuildHlsMasterItems(document);
-        foreach (var variant in projection.Items)
+        var projectionData = projection ?? new HlsMasterEditorParser().Parse(document);
+        foreach (var variant in projectionData.Items)
         {
             Variants.Add(new HlsMasterVariantViewModel(variant));
         }

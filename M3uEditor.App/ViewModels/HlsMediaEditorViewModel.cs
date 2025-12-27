@@ -3,6 +3,7 @@ using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using M3uEditor.Core;
 using M3uEditor.Core.Editing;
+using M3uEditor.Core.Parsing.Editors;
 using M3uEditor.Core.Projection;
 
 namespace M3uEditor.App.ViewModels;
@@ -64,10 +65,10 @@ public partial class HlsMediaEditorViewModel : ObservableObject
     [ObservableProperty]
     private HlsMediaSegmentViewModel? selectedSegment;
 
-    public HlsMediaEditorViewModel(PlaylistDocument document)
+    public HlsMediaEditorViewModel(PlaylistDocument document, HlsMediaProjection? projection = null)
     {
         _document = document;
-        Load(document);
+        Load(document, projection);
     }
 
     [RelayCommand]
@@ -82,13 +83,13 @@ public partial class HlsMediaEditorViewModel : ObservableObject
         PlaylistEditor.UpdateHlsExtInf(_document, SelectedSegment.ExtInfLineIndex, SelectedSegment.Duration, SelectedSegment.Title);
     }
 
-    private void Load(PlaylistDocument document)
+    private void Load(PlaylistDocument document, HlsMediaProjection? projection)
     {
         Segments.Clear();
         HeaderTags.Clear();
 
-        var projection = PlaylistProjectionBuilder.BuildHlsMediaSegments(document);
-        foreach (var headerIndex in projection.HeaderTagIndices)
+        var projectionData = projection ?? new HlsMediaEditorParser().Parse(document);
+        foreach (var headerIndex in projectionData.HeaderTagIndices)
         {
             if (headerIndex >= 0 && headerIndex < document.Lines.Count)
             {
@@ -96,7 +97,7 @@ public partial class HlsMediaEditorViewModel : ObservableObject
             }
         }
 
-        foreach (var segment in projection.Segments.Items)
+        foreach (var segment in projectionData.Segments.Items)
         {
             Segments.Add(new HlsMediaSegmentViewModel(document, segment));
         }
