@@ -18,13 +18,13 @@ public sealed class DiagnosticSeverityToBrushConverter : IValueConverter
         {
             return severity switch
             {
-                DiagnosticSeverity.Error => ErrorBrush ?? new SolidColorBrush(Windows.UI.Colors.IndianRed),
-                DiagnosticSeverity.Warning => WarningBrush ?? new SolidColorBrush(Windows.UI.Colors.Goldenrod),
-                _ => InfoBrush ?? new SolidColorBrush(Windows.UI.Colors.DeepSkyBlue)
+                DiagnosticSeverity.Error => ErrorBrush ?? new SolidColorBrush(Colors.IndianRed),
+                DiagnosticSeverity.Warning => WarningBrush ?? new SolidColorBrush(Colors.Goldenrod),
+                _ => InfoBrush ?? new SolidColorBrush(Colors.DeepSkyBlue)
             };
         }
 
-        return new SolidColorBrush(Windows.UI.Colors.Gray);
+        return new SolidColorBrush(Colors.Gray);
     }
 
     public object ConvertBack(object value, Type targetType, object parameter, string language)
