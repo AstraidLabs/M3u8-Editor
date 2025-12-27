@@ -124,7 +124,7 @@ public partial class DocumentHostViewModel : ObservableObject
         reader.ReadBytes(bytes);
         var text = Encoding.UTF8.GetString(bytes);
 
-        var doc = PlaylistParser.Parse(text);
+        var doc = PlaylistParser.ParseText(text);
         doc.OriginalPath = file.Path;
         LoadFromDocument(doc, file.Path);
     }
@@ -265,7 +265,7 @@ public partial class DocumentHostViewModel : ObservableObject
         }
 
         var rendered = PlaylistWriter.Write(Document);
-        var reparsed = PlaylistParser.Parse(rendered);
+        var reparsed = PlaylistParser.ParseText(rendered);
         Document.Diagnostics.Clear();
         Document.Diagnostics.AddRange(reparsed.Diagnostics);
         Document.DetectedKind = reparsed.DetectedKind;

@@ -5,7 +5,7 @@ namespace M3uEditor.Core.Parsing;
 
 public class PlaylistParser : IPlaylistParser, IKindDetector
 {
-    public static PlaylistDocument Parse(string text) => new PlaylistParser().Parse(text);
+    public static PlaylistDocument ParseText(string text) => new PlaylistParser().Parse(text);
 
     public PlaylistDocument Parse(string text)
     {
